@@ -62,11 +62,14 @@ App = {
   markAdopted: function(adopters, account) {
       var adoptionInstance;
 
+      //if the adoption contract is deployed then get all the
       App.contracts.Adoption.deployed().then(function(instance) {
           adoptionInstance = instance;
-          return adoptionInstance.getAdopters.call();
+          return adoptionInstance.getAdopters.call();//call queries blockchain without spending any ether
       }).then(function(adopters) {
           for (i = 0; i < adopters.length; i++) {
+              //the adopters array of addresses is initialised with empty addresses
+              //if the address is not empty then change the text of the button corresponding to the petId
               if (adopters[i] !== '0x0000000000000000000000000000000000000000') {
                   $('.panel-pet').eq(i).find('button').text('Success').attr('disabled', true);
               }
