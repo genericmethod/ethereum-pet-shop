@@ -23,6 +23,7 @@ App = {
     return App.initWeb3();
   },
 
+  //web3 allows us to interact with Ethereum
   initWeb3: function() {
 
       // Is there an injected web3 instance?
@@ -38,9 +39,18 @@ App = {
   },
 
   initContract: function() {
-    /*
-     * Replace me...
-     */
+
+      $.getJSON('Adoption.json', function(data) {
+          // Get the necessary contract artifact file and instantiate it with truffle-contract
+          var AdoptionArtifact = data;
+          App.contracts.Adoption = TruffleContract(AdoptionArtifact);
+
+          // Set the provider for our contract
+          App.contracts.Adoption.setProvider(App.web3Provider);
+
+          // Use our contract to retrieve and mark the adopted pets
+          return App.markAdopted();
+      });
 
     return App.bindEvents();
   },
@@ -50,9 +60,20 @@ App = {
   },
 
   markAdopted: function(adopters, account) {
-    /*
-     * Replace me...
-     */
+      var adoptionInstance;
+
+      App.contracts.Adoption.deployed().then(function(instance) {
+          adoptionInstance = instance;
+          return adoptionInstance.getAdopters.call();
+      }).then(function(adopters) {
+          for (i = 0; i < adopters.length; i++) {
+              if (adopters[i] !== '0x0000000000000000000000000000000000000000') {
+                  $('.panel-pet').eq(i).find('button').text('Success').attr('disabled', true);
+              }
+          }
+      }).catch(function(err) {
+          console.log(err.message);
+      });
   },
 
   handleAdopt: function(event) {
